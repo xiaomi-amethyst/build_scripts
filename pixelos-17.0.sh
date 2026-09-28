@@ -24,3 +24,5 @@ breakfast amethyst userdebug
 
 echo "==> Starting build..."
 m pixelos
+
+./out/siso_failed_commands.sh
