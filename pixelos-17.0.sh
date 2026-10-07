@@ -43,7 +43,7 @@ if m pixelos || ./out/siso_failed_commands.sh; then
         RESPONSE=$(curl -s -F "file=@$ZIP_FILE" "https://upload.gofile.io/uploadfile")
 
         DOWNLOAD_PAGE=$(echo "$RESPONSE" | jq -r '.data.downloadPage')
-        FOLDER_ID=$(echo "$RESPONSE" | jq -r '.data.folderId')
+        FOLDER_ID=$(echo "$RESPONSE" | jq -r '.data.parentFolder')
 
         if [ -f "$RECOVERY_FILE" ] && [ -n "$FOLDER_ID" ] && [ "$FOLDER_ID" != "null" ]; then
             echo "==> Uploading Recovery: $(basename "$RECOVERY_FILE") to the same folder..."
