@@ -30,7 +30,7 @@ if m pixelos || ./out/siso_failed_commands.sh; then
 
     OUT_DIR="out/target/product/amethyst"
     
-    ZIP_FILE=$(find "$OUT_DIR" -maxdepth 1 -type f -name "PixelOS_*.zip" ! -name "*ota*" | head -n 1)
+    ZIP_FILE=$(ls -t "$OUT_DIR"/PixelOS_*.zip 2>/dev/null | grep -v -E "ota|target_files" | head -n 1)
 
     RECOVERY_FILE="$OUT_DIR/recovery.img"
     if [ ! -f "$RECOVERY_FILE" ]; then
