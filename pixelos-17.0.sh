@@ -44,10 +44,11 @@ if m pixelos || ./out/siso_failed_commands.sh; then
 
         DOWNLOAD_PAGE=$(echo "$RESPONSE" | jq -r '.data.downloadPage')
         FOLDER_ID=$(echo "$RESPONSE" | jq -r '.data.parentFolder')
+        GUEST_TOKEN=$(echo "$RESPONSE" | jq -r '.data.guestToken')
 
         if [ -f "$RECOVERY_FILE" ] && [ -n "$FOLDER_ID" ] && [ "$FOLDER_ID" != "null" ]; then
             echo "==> Uploading Recovery: $(basename "$RECOVERY_FILE") to the same folder..."
-            curl -s -F "file=@$RECOVERY_FILE" -F "folderId=$FOLDER_ID" "https://upload.gofile.io/uploadfile" > /dev/null
+            curl -s -F "file=@$RECOVERY_FILE" -F "folderId=$FOLDER_ID" -F "token=$GUEST_TOKEN" "https://upload.gofile.io/uploadfile" > /dev/null
         fi
 
         echo "================================================="
