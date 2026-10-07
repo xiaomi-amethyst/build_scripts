@@ -23,4 +23,42 @@ source build/envsetup.sh
 breakfast amethyst userdebug
 
 echo "==> Starting build..."
-m pixelos || ./out/siso_failed_commands.sh
+if m pixelos || ./out/siso_failed_commands.sh; then
+    echo "========================================"
+    echo "==> Build SUCCESSFUL! Starting upload..."
+    echo "========================================"
+
+    OUT_DIR="out/target/product/amethyst"
+    
+    ZIP_FILE=$(find "$OUT_DIR" -maxdepth 1 -type f -name "PixelOS_*.zip" ! -name "*ota*" | head -n 1)
+
+    RECOVERY_FILE="$OUT_DIR/recovery.img"
+    if [ ! -f "$RECOVERY_FILE" ]; then
+        RECOVERY_FILE="$OUT_DIR/vendor_boot.img"
+    fi
+
+    if [ -f "$ZIP_FILE" ]; then
+        echo "==> Uploading ROM: $(basename "$ZIP_FILE")..."
+
+        RESPONSE=$(curl -s -F "file=@$ZIP_FILE" "https://upload.gofile.io/uploadfile")
+
+        DOWNLOAD_PAGE=$(echo "$RESPONSE" | jq -r '.data.downloadPage')
+        FOLDER_ID=$(echo "$RESPONSE" | jq -r '.data.folderId')
+
+        if [ -f "$RECOVERY_FILE" ] && [ -n "$FOLDER_ID" ] && [ "$FOLDER_ID" != "null" ]; then
+            echo "==> Uploading Recovery: $(basename "$RECOVERY_FILE") to the same folder..."
+            curl -s -F "file=@$RECOVERY_FILE" -F "folderId=$FOLDER_ID" "https://upload.gofile.io/uploadfile" > /dev/null
+        fi
+
+        echo "================================================="
+        echo "   SUCCESS! Download link with all files:"
+        echo "   $DOWNLOAD_PAGE"
+        echo "================================================="
+    else
+        echo "==> Error: ROM ZIP file not found in $OUT_DIR"
+        exit 1
+    fi
+else
+    echo "==> Build FAILED! Upload skipped."
+    exit 1
+fi
